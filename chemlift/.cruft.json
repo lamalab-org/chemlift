@@ -1,0 +1,19 @@
+{
+  "template": "https://github.com/kjappelbaum/cookiecutter-snekpack",
+  "commit": "61948fb3731c9ed94ae8fbd0e0d31d46823f4d9b",
+  "checkout": null,
+  "context": {
+    "cookiecutter": {
+      "package_name": "chemlift",
+      "package_name_stylized": "chemlift",
+      "short_description": "Chemical language interfaced fine-tuning of large-language models",
+      "author_name": "Kevin Maik Jablonka",
+      "author_email": "mail@kjablonka.com",
+      "github_organization_name": "lamalab-org",
+      "github_repository_name": "chemlift",
+      "command_line_interface": "False",
+      "_template": "https://github.com/kjappelbaum/cookiecutter-snekpack"
+    }
+  },
+  "directory": null
+}

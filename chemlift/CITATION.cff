@@ -1,0 +1,8 @@
+cff-version: 1.0.2
+message: "If you use this software, please cite it as below."
+title: "chemlift"
+authors:
+  - name: "Kevin Maik Jablonka"
+version: 0.0.1-dev
+doi:
+url: "https://github.com/lamalab-org/chemlift"
