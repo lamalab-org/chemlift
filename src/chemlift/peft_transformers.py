@@ -92,9 +92,7 @@ def print_trainable_parameters(model):
     )
 
 
-def load_model(
-    base_model: str = "gptj", load_in_8bit: bool = True, lora_kwargs: dict = {}
-):
+def load_model(base_model: str = "gptj", load_in_8bit: bool = True, lora_kwargs: dict = {}):
     tokenizer = AutoTokenizer.from_pretrained(base_model)
     tokenizer.pad_token = tokenizer.eos_token
     tokenizer.padding_side = PADDING_SIDE_MAPPING[base_model]
@@ -198,13 +196,9 @@ def train_model(
         model=model,
         train_dataset=train_data,
         args=transformers.TrainingArguments(**train_kwargs),
-        data_collator=transformers.DataCollatorForLanguageModeling(
-            tokenizer, mlm=False
-        ),
+        data_collator=transformers.DataCollatorForLanguageModeling(tokenizer, mlm=False),
     )
-    model.config.use_cache = (
-        False  # silence the warnings. Please re-enable for inference!
-    )
+    model.config.use_cache = False  # silence the warnings. Please re-enable for inference!
     with torch.autocast("cuda" if torch.cuda.is_available() else "cpu"):
         trainer.train()
 
@@ -258,8 +252,7 @@ def complete(
             )
 
             this_completion = [
-                {"out": o, "decoded": tokenizer.decode(o, skip_special_tokens=True)}
-                for o in out
+                {"out": o, "decoded": tokenizer.decode(o, skip_special_tokens=True)} for o in out
             ]
             all_completions.extend(this_completion)
 

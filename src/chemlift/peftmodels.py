@@ -1,4 +1,4 @@
-from typing import List, Optional, Union
+from typing import Any, List, Optional, Union
 from copy import deepcopy
 import numpy as np
 import pandas as pd
@@ -6,12 +6,13 @@ import torch
 from gptchem.extractor import ClassificationExtractor
 from gptchem.formatter import ClassificationFormatter
 from gptchem.gpt_classifier import GPTClassifier
+from gptchem.tuner import Tuner
 from more_itertools import chunked
 from numpy.typing import ArrayLike
 from tqdm import tqdm
 
-from gptjchem.peft_transformers import load_model, train_model, complete, tokenize
-from gptjchem.utils import (
+from chemlift.peft_transformers import load_model, train_model, complete, tokenize
+from chemlift.utils import (
     get_mode,
     try_exccept_nan,
     augment_smiles,
@@ -26,10 +27,15 @@ class ChemLIFTClassifierFactory:
         self.model_name = model_name
         self.kwargs = kwargs
 
-        if "openai" in model_name:
-            self = GPTClassifier(model_name, **kwargs)
+    def create_model(self):
+        if "openai" in self.model_name:
+            tuner = Tuner(**self.kwargs)
+            return GPTClassifier(self.model_name, tuner=tuner, **self.kwargs)
         else:
-            self = PEFTClassifier(model_name, **kwargs)
+            return PEFTClassifier(self.model_name, **self.kwargs)
+
+    def __call__(self):
+        return self.create_model()
 
 
 class PEFTClassifier(GPTClassifier):
@@ -93,9 +99,12 @@ class PEFTClassifier(GPTClassifier):
             X (ArrayLike): Input data (typically array of molecular representations)
             layers (Optional[Union[int, List[int]]], optional): Layers to return embeddings from.
                 Defaults to -1.
-            padding (bool, optional): Whether to pad the input. Defaults to True.
-            truncation (bool, optional): Whether to truncate the input. Defaults to True.
-            insert_in_template (bool, optional): Whether to insert the input in the template. Defaults to True.
+            padding (bool, optional): Whether to pad the input.
+                Defaults to True.
+            truncation (bool, optional): Whether to truncate the input.
+                Defaults to True.
+            insert_in_template (bool, optional): Whether to insert the input in the template.
+                Defaults to True.
 
         Returns:
             ArrayLike: Embeddings
@@ -142,15 +151,11 @@ class PEFTClassifier(GPTClassifier):
                     truncation=truncation,
                 )
                 prompt = tokenize_partial(batch)
-                outs = self.model.forward(
-                    prompt["input_ids"], output_hidden_states=True
-                )
+                outs = self.model.forward(prompt["input_ids"], output_hidden_states=True)
                 if isinstance(layers, int):
                     embeddings.append(outs.hidden_states[layers].cpu().numpy())
                 else:
-                    embeddings.append(
-                        [outs.hidden_states[i].cpu().numpy() for i in layers]
-                    )
+                    embeddings.append([outs.hidden_states[i].cpu().numpy() for i in layers])
         # flatten the batch dim
         embeddings = np.concatenate(embeddings, axis=0)
 
@@ -262,9 +267,7 @@ class PEFTClassifier(GPTClassifier):
 
         predictions = []
         for df in dfs:
-            predictions.append(
-                self._query(df, temperature=temperature, do_sample=do_sample)
-            )
+            predictions.append(self._query(df, temperature=temperature, do_sample=do_sample))
 
         return predictions
 
@@ -288,9 +291,7 @@ class PEFTClassifier(GPTClassifier):
         )
 
         if return_std:
-            predictions_std = np.array(
-                [np.std(pred) for pred in predictions.astype(int)]
-            )
+            predictions_std = np.array([np.std(pred) for pred in predictions.astype(int)])
             return predictions_mode, predictions_std
         return predictions_mode
 
@@ -418,10 +419,7 @@ class SMILESAugmentedPEFTClassifier(PEFTClassifier):
 
         # nan values make issues here
         predictions_mode = np.array(
-            [
-                try_exccept_nan(get_mode, np.array(pred).astype(int))
-                for pred in predictions
-            ]
+            [try_exccept_nan(get_mode, np.array(pred).astype(int)) for pred in predictions]
         )
         predictions_std = np.array([np.std(pred) for pred in predictions])
         return predictions_mode, predictions_std
