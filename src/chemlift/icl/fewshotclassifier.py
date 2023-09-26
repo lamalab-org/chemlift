@@ -1,7 +1,7 @@
 from loguru import logger
 from numpy.typing import ArrayLike
 
-from langchem.incontext.fewshotpredictor import FewShotPredictor
+from chemlift.icl.fewshotpredictor import FewShotPredictor
 
 
 class FewShotClassifier(FewShotPredictor):
@@ -9,10 +9,7 @@ class FewShotClassifier(FewShotPredictor):
 
     def _extract(self, generations, expected_len):
         generations = sum(
-            [
-                g.generations[0][0].text.replace("Answer: ", "").strip().split(", ")
-                for g in generations
-            ],
+            [g[0].text.replace("Answer: ", "").strip().split(",") for g in generations.generations],
             [],
         )
         if len(generations) != expected_len:
@@ -23,7 +20,7 @@ class FewShotClassifier(FewShotPredictor):
             generations_ = []
             for g in generations:
                 try:
-                    generations_.append(int(g))
+                    generations_.append(int(g.strip()))
                 except Exception:
                     generations_.append(None)
             generations = generations_
@@ -32,4 +29,4 @@ class FewShotClassifier(FewShotPredictor):
 
     def predict(self, X: ArrayLike, generation_kwargs: dict = {}):
         generations = self._predict(X, generation_kwargs)
-        return self._extract(generations, expected_len=len(X))
+        return self._extract(generations[0], expected_len=len(X))
