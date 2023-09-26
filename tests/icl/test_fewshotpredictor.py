@@ -32,3 +32,11 @@ def test_fewshotpredictor(get_llm):
     assert predictor._support_set is not None
     x, y = predictor._support_set
     assert len(x) == 5 == len(y)
+    formatted = predictor._format_examples(x, y)
+    assert isinstance(formatted, str)
+    assert formatted.startswith("-")
+    parts = formatted.split("\n")
+    assert len(parts) == 5
+    for part in parts:
+        assert "-" in part
+        assert ":" in part
