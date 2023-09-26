@@ -60,4 +60,16 @@ from langchain.llms import OpenAI
 classifier = FewShotClassifier(LangChainChatModelWrapper(ChatAnthropic()))
 # or classifier = FewShotClassifier(OpenAI())
 classifier.fit(X, y)
+classifier.predict(X)
 ```
+
+Note that the logic is built such that if the number of extracted outputs is not equal to the number query points, we will return :code:`None` 
+as prediction for all query points. This is the case because with the current fixed prompt setup, we cannot unambiguously assign the outputs to the query points. 
+
+Classification 
+----------------
+
+
+
+Regression
+--------------

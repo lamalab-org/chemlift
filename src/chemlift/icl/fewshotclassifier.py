@@ -9,9 +9,14 @@ class FewShotClassifier(FewShotPredictor):
 
     def _extract(self, generations, expected_len):
         generations = sum(
-            [g[0].text.replace("Answer: ", "").strip().split(",") for g in generations.generations],
+            [
+                g[0].text.split(":")[-1].replace("Answer: ", "").strip().split(",")
+                for generation in generations
+                for g in generation.generations
+            ],
             [],
         )
+        print(generations, len(generations))
         if len(generations) != expected_len:
             logger.warning(f"Expected {expected_len} generations, got {len(generations)}")
             return [None] * expected_len
@@ -29,4 +34,4 @@ class FewShotClassifier(FewShotPredictor):
 
     def predict(self, X: ArrayLike, generation_kwargs: dict = {}):
         generations = self._predict(X, generation_kwargs)
-        return self._extract(generations[0], expected_len=len(X))
+        return self._extract(generations, expected_len=len(X))

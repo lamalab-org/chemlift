@@ -20,11 +20,13 @@ Answer with a comma-separated list of predictions for those {number} {materialcl
 Examples:
 {examples}
 
+Constraint: Make sure to return exactly {number} comma separated predictions. The predictions should be one of {allowed_values}. Return only the predictions.
+
 Answer:
 """
 
     template_single = """{prefix}What is {property_name} of {query} given the examples below?
-Answer concise by only the prediction on a new line, which is one of {allowed_values}.
+Answer concise by only returing the prediction, which should be one of {allowed_values}.
 
 Examples:
 {examples}
@@ -43,6 +45,7 @@ Answer:
         strategy: Strategy = Strategy.RANDOM,
         seed: int = 42,
         prefix: str = "You are an expert chemist. ",
+        max_test: int = 5,
     ):
         self._support_set = None
         self._llm = llm
@@ -52,7 +55,7 @@ Answer:
         self._property_name = property_name
         self._allowed_values = None
         self._materialclass = "molecules"
-        self._max_test = 10
+        self._max_test = max_test
         self._prefix = prefix
 
     def _format_examples(self, examples, targets):
@@ -126,6 +129,7 @@ Answer:
                     number=len(chunk),
                     materialclass=self._materialclass,
                     prefix=self._prefix,
+                    allowed_values=", ".join(map(str, list(self._allowed_values))),
                 )
             else:
                 examples = self._format_examples(support_examples, support_targets)
@@ -135,7 +139,7 @@ Answer:
                     property_name=self._property_name,
                     query=queries,
                     examples=examples,
-                    allowed_values=allowed_values,
+                    allowed_values=", ".join(map(str, list(self._allowed_values))),
                     prefix=self._prefix,
                 )
 
