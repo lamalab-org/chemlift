@@ -24,3 +24,11 @@ def get_claude():
 
     llm = LangChainChatModelWrapper(ChatAnthropic())
     return llm
+
+
+@pytest.fixture()
+def get_davinci():
+    from langchain.llms import OpenAI
+
+    llm = OpenAI(model_name="text-davinci-003")
+    return llm
