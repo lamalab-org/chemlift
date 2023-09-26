@@ -20,7 +20,7 @@ def test_fewshotpredictor(get_llm):
 
     predictor = FewShotPredictor(
         llm,
-        property_name="E isomer pi-pi* wavelength in nm",
+        property_name="class of the transition wavelength",
         n_support=5,
         strategy=Strategy.RANDOM,
         seed=42,
@@ -40,3 +40,17 @@ def test_fewshotpredictor(get_llm):
     for part in parts:
         assert "-" in part
         assert ":" in part
+
+    queries = predictor._format_queries(["CC", "CCC"])
+    assert isinstance(queries, str)
+
+    prompt = predictor.template.format(
+        property_name=predictor._property_name,
+        queries=queries,
+        examples=formatted,
+        number=predictor._n_support,
+        materialclass=predictor._materialclass,
+        prefix=predictor._prefix,
+    )
+
+    assert isinstance(prompt, str)
