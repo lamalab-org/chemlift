@@ -1,6 +1,21 @@
 Getting started
 =====================
 
+
+The first thing you need to do is to decide whether you want to use in-context learning or fine-tuning. 
+The choice depends on multiple factors: 
+
+- If you have a lot of training data, they will not fit into the context window of the model.
+In this case, the only way to use all data points is to go with fine-tuning
+- If you have only a handful of data points, you will be able to achieve good results with finetuning. 
+In this case, you might have more luck with in context learning.
+
+
+
+Fine-tuning 
+...............
+
+
 Classification 
 -----------------
 
@@ -24,3 +39,25 @@ estimate_rounding_error(y, 2)
 ```
 
 which will return a dictionary with the best-case regression metrics a perfect model could achieve given this rounding. 
+
+
+In-context learning (ICL)
+...........................
+
+The is no real "fitting" process in the in-context learning setting.
+The only thing that happens if you call :code:`model.fit()` is that we might select the support set. 
+In this case, support set refers to the samples that are shown to the model in the prompt. 
+
+For ICL, you need to provide a LangChain LLM model. If you want to use a LangChain chat model, you can use it 
+via our wrapper. 
+
+```python
+from chemlift.icl.utils import LangChainChatModelWrapper
+from chemlift.icl.fewshotclassifier import FewShotClassifier
+from langchain.chat_models import ChatAnthropic
+from langchain.llms import OpenAI
+
+classifier = FewShotClassifier(LangChainChatModelWrapper(ChatAnthropic()))
+# or classifier = FewShotClassifier(OpenAI())
+classifier.fit(X, y)
+```
