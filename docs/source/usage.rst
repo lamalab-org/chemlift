@@ -33,6 +33,28 @@ model.predict(X)
 The model name can be any model name that is supported by the transformers library.
 In addition to that, we also support OpenAI models, if you prefix the model name with :code:`openai/`, e.g. :code:`openai/text-davinci-003`.
 
+Concretely, on the ESOL dataset, this might look like this:
+
+```python
+from sklearn.model_selection import train_test_split
+import pandas as pd
+
+from gptchem.data import get_esol_data # this is a helper function to get the ESOL dataset
+from chemlift.finetune.peftmodels import ChemLIFTClassifierFactory # this is the factory to create the model
+
+# prepare data 
+df = get_esol_data()
+train_df, test_df = train_test_split(df, test_size=0.2, random_state=42)
+train_names, train_y = train_df['Compound ID'], train_df['ESOL predicted log(solubility:mol/L)']
+test_names, test_y = test_df['Compound ID'], test_df['ESOL predicted log(solubility:mol/L)']
+
+# train 
+model = ChemLIFTClassifierFactory('EleutherAI/gpt-neo-125m', load_in_8bit=False).create_model() # create the model
+model.fit(train_names, train_y)
+
+# predict
+preds = model.predict(test_names)
+```
 
 Regression 
 -----------------
