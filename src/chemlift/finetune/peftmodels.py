@@ -23,16 +23,18 @@ from peft.utils.save_and_load import set_peft_model_state_dict
 
 
 class ChemLIFTClassifierFactory:
-    def __init__(self, model_name: str, **kwargs):
+    def __init__(self, property_name: str, model_name: str, **kwargs):
         self.model_name = model_name
         self.kwargs = kwargs
+        self.property_name = property_name
 
     def create_model(self):
-        if "openai" in self.model_name:
-            tuner = Tuner(**self.kwargs)
-            return GPTClassifier(self.model_name, tuner=tuner, **self.kwargs)
+        if "openai/" in self.model_name:
+            model = self.model_name.split("/")[-1]
+            tuner = Tuner(base_model=model, **self.kwargs)
+            return GPTClassifier(self.property_name, tuner=tuner, **self.kwargs)
         else:
-            return PEFTClassifier(self.model_name, **self.kwargs)
+            return PEFTClassifier(self.property_name, base_model=self.model_name, **self.kwargs)
 
     def __call__(self):
         return self.create_model()
