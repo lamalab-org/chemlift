@@ -1,9 +1,9 @@
 import numpy as np
 from rdkit import Chem
-import selfies as sf
+
 import time
 
-import deepsmiles
+
 import requests
 
 
@@ -47,6 +47,7 @@ def smiles_to_selfies(smiles):
     """
     Takes a SMILES and return the selfies encoding.
     """
+    import selfies as sf
 
     return [sf.encoder(smiles)]
 
@@ -55,6 +56,8 @@ def smiles_to_deepsmiles(smiles):
     """
     Takes a SMILES and return the DeepSMILES encoding.
     """
+    import deepsmiles
+
     converter = deepsmiles.Converter(rings=True, branches=True)
     return converter.encode(smiles)
 
