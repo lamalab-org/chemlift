@@ -40,13 +40,19 @@ from sklearn.model_selection import train_test_split
 import pandas as pd
 
 from gptchem.data import get_esol_data # this is a helper function to get the ESOL dataset
+from gptchem.evaluator import evaluate_classification # this is a helper function to evaluate the model
 from chemlift.finetune.peftmodels import ChemLIFTClassifierFactory # this is the factory to create the model
+import numpy as np
 
 # prepare data 
 df = get_esol_data()
 train_df, test_df = train_test_split(df, test_size=0.2, random_state=42)
 train_names, train_y = train_df['Compound ID'], train_df['ESOL predicted log(solubility:mol/L)']
 test_names, test_y = test_df['Compound ID'], test_df['ESOL predicted log(solubility:mol/L)']
+# convert to balanced classification task
+train_median = np.median(train_y) 
+train_y = [1 if y > train_median else 0 for y in train_y]
+test_y = [1 if y > train_median else 0 for y in test_y]
 
 # train 
 model = ChemLIFTClassifierFactory('EleutherAI/gpt-neo-125m', load_in_8bit=False).create_model() # create the model
@@ -54,6 +60,9 @@ model.fit(train_names, train_y)
 
 # predict
 preds = model.predict(test_names)
+
+# evaluate
+evaluate_classification(test_y, preds)
 ```
 
 Regression 
@@ -74,6 +83,14 @@ estimate_rounding_error(y, 2)
 ```
 
 which will return a dictionary with the best-case regression metrics a perfect model could achieve given this rounding. 
+
+
+
+Common issues
+--------------
+
+You might run out of memory. Very important parameters to play with are :code:`inference_batch_size` and :code:`batch_size` as well as the :code:`cutoff_len` in the :code:`tokenizer_kwargs`
+
 
 
 In-context learning (ICL)
