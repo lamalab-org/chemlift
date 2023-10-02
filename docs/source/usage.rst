@@ -19,6 +19,19 @@ Fine-tuning
 Classification 
 -----------------
 
+To handle the different model types, we provide a :code:`ChemLIFTClassifierFactory` that allows to easily create a classifier objects for the different model types.
+
+```python
+
+from chemlift.finetuning.classifier import ChemLIFTClassifierFactory
+
+model = ChemLIFTClassifierFactory('EleutherAI/gpt-neo-125m', load_in_8bit=False).create_model()
+model.fit(X, y)
+model.predict(X)
+```
+
+The model name can be any model name that is supported by the transformers library.
+In addition to that, we also support OpenAI models, if you prefix the model name with :code:`openai/`, e.g. :code:`openai/text-davinci-003`.
 
 
 Regression 
