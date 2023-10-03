@@ -285,7 +285,7 @@ class PEFTClassifier(GPTClassifier):
         temperature=0.7,
         do_sample=False,
         formatted: Optional[pd.DataFrame] = None,
-        return_std: bool = True,
+        return_std: bool = False,
     ):
         predictions = self._predict(
             X=X, temperature=temperature, do_sample=do_sample, formatted=formatted
@@ -334,7 +334,7 @@ class PEFTClassifier(GPTClassifier):
 
 
 class PEFTRegressor(PEFTClassifier):
-     def __init__(
+    def __init__(
         self,
         property_name: str,
         extractor: RegressionExtractor = RegressionExtractor(),
@@ -376,8 +376,31 @@ class PEFTRegressor(PEFTClassifier):
 
         self.tune_settings["per_device_train_batch_size"] = self.batch_size
 
-    __repr__ = basic_repr("property_name", "_base_model", 'num_digits')
+    __repr__ = basic_repr("property_name", "_base_model", "num_digits")
 
+    def predict(
+        self,
+        X: Optional[ArrayLike] = None,
+        temperature=0.7,
+        do_sample=False,
+        formatted: Optional[pd.DataFrame] = None,
+        return_std: bool = False,
+    ):
+        predictions = self._predict(
+            X=X, temperature=temperature, do_sample=do_sample, formatted=formatted
+        )
+
+        predictions = np.array(predictions).T
+
+        # nan values make issues here
+        predictions_mean = np.array(
+            [try_exccept_nan(np.mean, pred) for pred in predictions.astype(int)]
+        )
+
+        if return_std:
+            predictions_std = np.array([np.std(pred) for pred in predictions.astype(int)])
+            return predictions_mean, predictions_std
+        return predictions_mean
 
 
 class SMILESAugmentedPEFTClassifier(PEFTClassifier):
