@@ -24,7 +24,18 @@ from fastcore.basics import basic_repr
 
 
 class ChemLIFTClassifierFactory:
+    """Factory for ChemLIFTClassifier."""
+
     def __init__(self, property_name: str, model_name: str, **kwargs):
+        """Initialize factory.
+
+        Args:
+            property_name (str): Name of the property to predict
+            model_name (str): Name of the model to use.
+                Can be a model available on HuggingFace or an OpenAI model.
+                Latter must be prefixed with `openai/`.
+            **kwargs: Keyword arguments passed to the model.
+        """
         self.model_name = model_name
         self.kwargs = kwargs
         self.property_name = property_name
@@ -32,6 +43,7 @@ class ChemLIFTClassifierFactory:
     __repr__ = basic_repr("property_name", "model_name")
 
     def create_model(self):
+        """Create a ChemLIFTClassifier."""
         if "openai/" in self.model_name:
             model = self.model_name.split("/")[-1]
             tuner = Tuner(base_model=model, **self.kwargs)
@@ -44,6 +56,16 @@ class ChemLIFTClassifierFactory:
 
 
 class PEFTClassifier(GPTClassifier):
+    """Language-interfaced fine-tuning (LIFT) for chemical property prediction.
+
+    This class implements the Language-interfaced fine-tuning (LIFT)
+    approach for chemical property prediction [GPTChem]_ with open-source langauge models.
+
+    References:
+
+    .. [GPTChem] `Jablonka, K. M.; Schwaller, P.; Ortega-Guerrero, A.; Smit, B. Is GPT All You Need for Low-Data Discovery in Chemistry? 2023. <https://doi.org/10.26434/chemrxiv-2023-fw8n4-v2>.`_
+    """
+
     def __init__(
         self,
         property_name: str,
