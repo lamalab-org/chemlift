@@ -20,6 +20,7 @@ from chemlift.utils import (
 from transformers.utils import logging
 from functools import partial
 from peft.utils.save_and_load import set_peft_model_state_dict
+from fastcore.basics import basic_repr
 
 
 class ChemLIFTClassifierFactory:

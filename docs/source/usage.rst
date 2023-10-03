@@ -25,7 +25,8 @@ To handle the different model types, we provide a :code:`ChemLIFTClassifierFacto
 
 from chemlift.finetuning.classifier import ChemLIFTClassifierFactory
 
-model = ChemLIFTClassifierFactory('EleutherAI/gpt-neo-125m', load_in_8bit=False).create_model()
+model = ChemLIFTClassifierFactory('property name',
+                                    model_name='EleutherAI/pythia-1b-deduped').create_model()
 model.fit(X, y)
 model.predict(X)
 ```
@@ -55,7 +56,13 @@ train_y = [1 if y > train_median else 0 for y in train_y]
 test_y = [1 if y > train_median else 0 for y in test_y]
 
 # train 
-model = ChemLIFTClassifierFactory('EleutherAI/gpt-neo-125m', load_in_8bit=False).create_model() # create the model
+model = ChemLIFTClassifierFactory('transition wavelength class', # property name
+                                  model_name='EleutherAI/pythia-1b-deduped', # base model
+                                  load_in_8bit=True, # use quantized model 
+                                  inference_batch_size=32, # batch size for inference
+                                  tokenizer_kwargs={"cutoff_len": 50}, # tokenizer kwargs, cutoff_len is the most important one
+                                  tune_settings={'num_train_epochs': 32} # settings for the training process, see transformers docs
+                                  ).create_model() # create the model
 model.fit(train_names, train_y)
 
 # predict

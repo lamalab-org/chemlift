@@ -50,7 +50,7 @@ PADDING_SIDE_MAPPING = {
     "EleutherAI/gpt-neo-1.3B": "left",
     "EleutherAI/gpt-neo-2.7B": "left",
     "EleutherAI/gpt-neox-20b": "left",
-    "EleutherAI/pythia-12b-dedupedz``": "left",
+    "EleutherAI/pythia-12b-deduped": "left",
     "EleutherAI/pythia-6.9b-deduped": "left",
     "EleutherAI/pythia-2.8b-deduped": "left",
     "EleutherAI/pythia-1.4b-deduped": "left",
