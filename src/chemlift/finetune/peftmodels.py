@@ -3,8 +3,8 @@ from copy import deepcopy
 import numpy as np
 import pandas as pd
 import torch
-from gptchem.extractor import ClassificationExtractor
-from gptchem.formatter import ClassificationFormatter
+from gptchem.extractor import ClassificationExtractor, RegressionExtractor
+from gptchem.formatter import ClassificationFormatter, RegressionFormatter
 from gptchem.gpt_classifier import GPTClassifier
 from gptchem.tuner import Tuner
 from more_itertools import chunked
@@ -331,6 +331,53 @@ class PEFTClassifier(GPTClassifier):
         filtered = [v if v is not None else np.nan for v in extracted]
 
         return filtered
+
+
+class PEFTRegressor(PEFTClassifier):
+     def __init__(
+        self,
+        property_name: str,
+        extractor: RegressionExtractor = RegressionExtractor(),
+        batch_size: int = 64,
+        tune_settings: Optional[dict] = None,
+        inference_batch_size: int = 64,
+        formatter: Optional[RegressionFormatter] = None,
+        representation_names: Optional[List[str]] = None,
+        base_model: str = "EleutherAI/gpt-j-6b",
+        load_in_8bit: bool = True,
+        lora_kwargs: dict = {},
+        tokenizer_kwargs: dict = {},
+        num_digits: int = 3,
+    ):
+        self.property_name = property_name
+        self.extractor = extractor
+        self.batch_size = batch_size
+        self.tune_settings = tune_settings or {}
+        self.inference_batch_size = inference_batch_size
+
+        self.formatter = (
+            RegressionFormatter(
+                representation_column="repr",
+                label_column="prop",
+                property_name=property_name,
+                num_digits=num_digits,
+            )
+            if formatter is None
+            else formatter
+        )
+        self._base_model = base_model
+        self.model, self.tokenizer = load_model(
+            base_model=base_model, load_in_8bit=load_in_8bit, lora_kwargs=lora_kwargs
+        )
+        self.representation_names = representation_names if representation_names else []
+        self.tokenizer_kwargs = tokenizer_kwargs
+        if "cutoff_len" not in self.tokenizer_kwargs:
+            self.tokenizer_kwargs["cutoff_len"] = 1024
+
+        self.tune_settings["per_device_train_batch_size"] = self.batch_size
+
+    __repr__ = basic_repr("property_name", "_base_model", 'num_digits')
+
 
 
 class SMILESAugmentedPEFTClassifier(PEFTClassifier):
