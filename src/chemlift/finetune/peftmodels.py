@@ -29,6 +29,8 @@ class ChemLIFTClassifierFactory:
         self.kwargs = kwargs
         self.property_name = property_name
 
+    __repr__ = basic_repr("property_name", "model_name")
+
     def create_model(self):
         if "openai/" in self.model_name:
             model = self.model_name.split("/")[-1]
@@ -72,6 +74,7 @@ class PEFTClassifier(GPTClassifier):
             if formatter is None
             else formatter
         )
+        self._base_model = base_model
         self.model, self.tokenizer = load_model(
             base_model=base_model, load_in_8bit=load_in_8bit, lora_kwargs=lora_kwargs
         )
@@ -81,6 +84,8 @@ class PEFTClassifier(GPTClassifier):
             self.tokenizer_kwargs["cutoff_len"] = 1024
 
         self.tune_settings["per_device_train_batch_size"] = self.batch_size
+
+    __repr__ = basic_repr("property_name", "_base_model")
 
     def _prepare_df(self, X: ArrayLike, y: ArrayLike):
         rows = []
@@ -329,6 +334,26 @@ class PEFTClassifier(GPTClassifier):
 
 
 class SMILESAugmentedPEFTClassifier(PEFTClassifier):
+    """PEFTClassifier with SMILES augmentation.
+
+    The performance of models can often be performed using techniques such as SMILES augmentation [1]_, [2]_, [3]_.
+    This class implements SMILES augmentation for PEFTClassifier.
+    For this, we assume that the `X` passed to `fit` and `predict` is a list of SMILES strings.
+
+    References
+    ----------
+
+    .. [1] `Bjerrum, E. J. SMILES Enumeration as Data Augmentation for Neural Network Modeling of Molecules.
+            arXiv 2017. <https://doi.org/10.48550/ARXIV.1703.07076>.`_
+    .. [2] `Kimber, T. B.; Gagnebin, M.; Volkamer, A.
+            Maxsmi: Maximizing Molecular Property Prediction Performance with Confidence Estimation
+            Using SMILES Augmentation and Deep Learning.
+            Artificial Intelligence in the Life Sciences 2021, 1, 100014. <https://doi.org/10.1016/j.ailsci.2021.100014>.`_
+    .. [3] `Schwaller, P.; Vaucher, A. C.; Laino, T.; Reymond, J.-L.
+            Data Augmentation Strategies to Improve Reaction Yield Predictions and Estimate Uncertainty.
+            2020. <https://doi.org/10.26434/chemrxiv.13286741.v1>.`_
+    """
+
     def fit(
         self,
         X: Optional[ArrayLike] = None,
