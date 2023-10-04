@@ -15,4 +15,6 @@ python:
     - method: pip
       path: .
       extra_requirements:
-        - docs
+        - docs 
+sphinx:
+   configuration: docs/source/conf.py

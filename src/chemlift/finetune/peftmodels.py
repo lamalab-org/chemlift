@@ -386,7 +386,7 @@ class PEFTClassifier(GPTClassifier):
         return filtered
 
 
-class PEFTRegressor(PEFTClassifier):
+class RoundedPEFTRegressor(PEFTClassifier):
     """Language-interfaced fine-tuning (LIFT) for chemical property prediction.
 
     This class implements the Language-interfaced fine-tuning (LIFT)
