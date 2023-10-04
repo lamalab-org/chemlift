@@ -14,7 +14,7 @@ def array_of_ints_without_nan(arr):
 def try_exccept_nan(f, x):
     try:
         return f(x)
-    except:
+    except Exception:
         return np.nan
 
 

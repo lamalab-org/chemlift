@@ -1,8 +1,6 @@
 from loguru import logger
 from numpy.typing import ArrayLike
-from typing import Union
 from chemlift.icl.fewshotpredictor import FewShotPredictor
-from chemlift.icl.utils import LangChainChatModelWrapper
 
 
 class FewShotClassifier(FewShotPredictor):

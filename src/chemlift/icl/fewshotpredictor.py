@@ -6,7 +6,6 @@ from more_itertools import chunked
 from numpy.typing import ArrayLike
 import enum
 from typing import Union
-from chemlift.icl.fewshotpredictor import FewShotPredictor
 from chemlift.icl.utils import LangChainChatModelWrapper
 
 

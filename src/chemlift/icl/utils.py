@@ -1,5 +1,13 @@
 class LangChainChatModelWrapper:
-    """Wrapper for chat model to make it accept plain text prompts."""
+    """Wrapper for chat model to make it accept plain text prompts.
+
+    Examples:
+        >>> from chemlift.icl.utils import LangChainChatModelWrapper
+        >>> from langchain.chat_models import ChatOpenAI
+        >>> model = ChatOpenAI(model="gpt-4")
+        >>> model = LangChainChatModelWrapper(model)
+        >>> model.generate(["Hello, how are you?"])
+    """
 
     def __init__(self, model):
         self.model = model
