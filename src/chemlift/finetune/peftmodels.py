@@ -69,7 +69,6 @@ class PEFTClassifier(GPTClassifier):
     def __init__(
         self,
         property_name: str,
-        extractor: ClassificationExtractor = ClassificationExtractor(),
         batch_size: int = 64,
         tune_settings: Optional[dict] = None,
         inference_batch_size: int = 64,
@@ -79,7 +78,30 @@ class PEFTClassifier(GPTClassifier):
         load_in_8bit: bool = True,
         lora_kwargs: dict = {},
         tokenizer_kwargs: dict = {},
+        extractor: ClassificationExtractor = ClassificationExtractor(),
     ):
+        """
+        Args:
+            property_name (str): Name of the property to predict
+            batch_size (int, optional): Batch size for training. Defaults to 64.
+            tune_settings (Optional[dict], optional): Settings for training.
+                Defaults to None.
+            inference_batch_size (int, optional): Batch size for inference.
+                Defaults to 64.
+            formatter (Optional[ClassificationFormatter], optional): Formatter for data.
+                Defaults to None. In this case, a default formatter is used.
+            representation_names (Optional[List[str]], optional): Names of the representations.
+                Defaults to None.
+            base_model (str, optional): Name of the base model. Defaults to "EleutherAI/gpt-j-6b".
+            load_in_8bit (bool, optional): Whether to load the model in 8bit mode.
+                Defaults to True.
+            lora_kwargs (dict, optional): Keyword arguments passed to the model.
+                Defaults to {}.
+            tokenizer_kwargs (dict, optional): Keyword arguments passed to the tokenizer.
+                Defaults to {}.
+            extractor (ClassificationExtractor, optional): Extractor for the property value.
+                Defaults to ClassificationExtractor().
+        """
         self.property_name = property_name
         self.extractor = extractor
         self.batch_size = batch_size
@@ -356,10 +378,19 @@ class PEFTClassifier(GPTClassifier):
 
 
 class PEFTRegressor(PEFTClassifier):
+    """Language-interfaced fine-tuning (LIFT) for chemical property prediction.
+
+    This class implements the Language-interfaced fine-tuning (LIFT)
+    for regression tasks [GPTChem]_ with open-source langauge models.
+
+    References:
+
+    .. [GPTChem] `Jablonka, K. M.; Schwaller, P.; Ortega-Guerrero, A.; Smit, B. Is GPT All You Need for Low-Data Discovery in Chemistry? 2023. <https://doi.org/10.26434/chemrxiv-2023-fw8n4-v2>.`_
+    """
+
     def __init__(
         self,
         property_name: str,
-        extractor: RegressionExtractor = RegressionExtractor(),
         batch_size: int = 64,
         tune_settings: Optional[dict] = None,
         inference_batch_size: int = 64,
@@ -370,7 +401,32 @@ class PEFTRegressor(PEFTClassifier):
         lora_kwargs: dict = {},
         tokenizer_kwargs: dict = {},
         num_digits: int = 3,
+        extractor: RegressionExtractor = RegressionExtractor(),
     ):
+        """
+        Args:
+            property_name (str): Name of the property to predict
+            batch_size (int, optional): Batch size for training. Defaults to 64.
+            tune_settings (Optional[dict], optional): Settings for training.
+                Defaults to None.
+            inference_batch_size (int, optional): Batch size for inference.
+                Defaults to 64.
+            formatter (Optional[RegressionFormatter], optional): Formatter for data.
+                Defaults to None. In this case, a default formatter is used.
+            representation_names (Optional[List[str]], optional): Names of the representations.
+                Defaults to None.
+            base_model (str, optional): Name of the base model. Defaults to "EleutherAI/gpt-j-6b".
+            load_in_8bit (bool, optional): Whether to load the model in 8bit mode.
+                Defaults to True.
+            lora_kwargs (dict, optional): Keyword arguments passed to the model.
+                Defaults to {}.
+            tokenizer_kwargs (dict, optional): Keyword arguments passed to the tokenizer.
+                Defaults to {}.
+            num_digits (int, optional): Number of digits to round to.
+                Defaults to 3.
+            extractor (RegressionExtractor, optional): Extractor for the property value.
+                Defaults to RegressionExtractor().
+        """
         self.property_name = property_name
         self.extractor = extractor
         self.batch_size = batch_size
