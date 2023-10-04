@@ -1,10 +1,13 @@
 from loguru import logger
 from numpy.typing import ArrayLike
-
+from typing import Union
 from chemlift.icl.fewshotpredictor import FewShotPredictor
+from chemlift.icl.utils import LangChainChatModelWrapper
 
 
 class FewShotClassifier(FewShotPredictor):
+    """A few-shot classifier using in-context learning."""
+
     intify = True
 
     def _extract(self, generations, expected_len):
@@ -16,7 +19,6 @@ class FewShotClassifier(FewShotPredictor):
             ],
             [],
         )
-        print(generations, len(generations))
         if len(generations) != expected_len:
             logger.warning(f"Expected {expected_len} generations, got {len(generations)}")
             return [None] * expected_len
@@ -33,5 +35,11 @@ class FewShotClassifier(FewShotPredictor):
         return generations
 
     def predict(self, X: ArrayLike, generation_kwargs: dict = {}):
+        """Predict the class of a list of examples.
+
+        Args:
+            X: A list of examples.
+            generation_kwargs: Keyword arguments to pass to the language model.
+        """
         generations = self._predict(X, generation_kwargs)
         return self._extract(generations, expected_len=len(X))

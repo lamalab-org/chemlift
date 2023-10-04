@@ -331,6 +331,19 @@ class PEFTClassifier(GPTClassifier):
         formatted: Optional[pd.DataFrame] = None,
         return_std: bool = False,
     ):
+        """
+        Args:
+            X (ArrayLike): Input data (typically array of molecular representations)
+            temperature (float, optional): Temperature for sampling. Defaults to 0.7.
+            do_sample (bool, optional): Whether to sample or not. Defaults to False.
+            formatted (pd.DataFrame, optional): Formatted data (typically output of `formatter`).
+                Defaults to None. If None, X must be provided.
+            return_std (bool, optional): Whether to return the standard deviation of the predictions.
+                Defaults to False.
+
+        Returns:
+            ArrayLike: Predicted property values (and standard deviation if `return_std` is True)
+        """
         predictions = self._predict(
             X=X, temperature=temperature, do_sample=do_sample, formatted=formatted
         )
@@ -459,11 +472,24 @@ class PEFTRegressor(PEFTClassifier):
     def predict(
         self,
         X: Optional[ArrayLike] = None,
-        temperature=0.7,
-        do_sample=False,
+        temperature: float = 0.7,
+        do_sample: int = False,
         formatted: Optional[pd.DataFrame] = None,
         return_std: bool = False,
     ):
+        """
+        Args:
+            X (ArrayLike): Input data (typically array of molecular representations)
+            temperature (float, optional): Temperature for sampling. Defaults to 0.7.
+            do_sample (bool, optional): Whether to sample or not. Defaults to False.
+            formatted (pd.DataFrame, optional): Formatted data (typically output of `formatter`).
+                Defaults to None. If None, X must be provided.
+            return_std (bool, optional): Whether to return the standard deviation of the predictions.
+                Defaults to False.
+        
+        Returns:
+            ArrayLike: Predicted property values (and standard deviation if `return_std` is True)
+        """
         predictions = self._predict(
             X=X, temperature=temperature, do_sample=do_sample, formatted=formatted
         )

@@ -5,6 +5,9 @@ from langchain.llms import BaseLLM
 from more_itertools import chunked
 from numpy.typing import ArrayLike
 import enum
+from typing import Union
+from chemlift.icl.fewshotpredictor import FewShotPredictor
+from chemlift.icl.utils import LangChainChatModelWrapper
 
 
 class Strategy(enum.Enum):
@@ -39,7 +42,7 @@ Answer:
 
     def __init__(
         self,
-        llm: BaseLLM,
+        llm: Union[BaseLLM, LangChainChatModelWrapper],
         property_name: str,
         n_support: int = 5,
         strategy: Strategy = Strategy.RANDOM,
@@ -47,6 +50,33 @@ Answer:
         prefix: str = "You are an expert chemist. ",
         max_test: int = 5,
     ):
+        """Initialize the few-shot predictor.
+
+        Args:
+            llm (Union[BaseLLM, LangChainChatModelWrapper]): The language model to use.
+            property_name (str): The property to predict.
+            n_support (int, optional): The number of examples to use as support set.
+                Defaults to 5.
+            strategy (Strategy, optional): The strategy to use to pick the support set.
+                Defaults to Strategy.RANDOM.
+            seed (int, optional): The random seed to use. Defaults to 42.
+            prefix (str, optional): The prefix to use for the prompt.
+                Defaults to "You are an expert chemist. ".
+            max_test (int, optional): The maximum number of examples to predict at once.
+                Defaults to 5.
+
+        Raises:
+            ValueError: If the strategy is unknown.
+
+        Examples:
+            >>> from chemlift.icl.fewshotpredictor import FewShotPredictor
+            >>> from langchain.llms import OpenAI
+            >>> llm = OpenAI(model_name="text-ada-001")
+            >>> predictor = FewShotPredictor(llm, property_name="melting point")
+            >>> predictor.fit(["water", "ethanol"], [0, 1])
+            >>> predictor.predict(["methanol"])
+            [0]
+        """
         self._support_set = None
         self._llm = llm
         self._n_support = n_support
@@ -134,7 +164,6 @@ Answer:
             else:
                 examples = self._format_examples(support_examples, support_targets)
                 queries = chunk[0]
-                allowed_values = ", ".join(map(str, list(self._allowed_values)))
                 prompt = self.template_single.format(
                     property_name=self._property_name,
                     query=queries,

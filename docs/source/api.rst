@@ -16,3 +16,6 @@ In-context learning
 
 .. automodule:: chemlift.icl.fewshotregressor
    :members:
+
+.. automodule:: chemlift.icl.fewshotpredictor
+   :members:
