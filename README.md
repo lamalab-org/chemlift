@@ -38,13 +38,45 @@
     </a>
 </p>
 
-Chemical language interfaced fine-tuning of large-language models
+Chemical language interfaced predictions using large language models.
 
 ## 💪 Getting Started
 
-> TODO show in a very small amount of space the **MOST** useful thing your package can do.
-> Make it as short as possible! You have an entire set of docs for later.
+With ChemLIFT you can use large language models to make predictions on chemical data. 
+You can use two different approaches:
 
+- **Few-shot learning**: Provide a few examples in the prompt along with the points you want to predict and the model will learn to predict the property of interest.
+- **Fine-tuning**: Fine-tune a large language model on a dataset of your choice and use it to make predictions. 
+
+Fine-tuning updates the weights of the model, while few-shot learning does not.
+
+### Few-shot learning
+
+```python
+from chemlift.icl.fewshotclassifier import FewShotClassifier
+from langchain.llms import OpenAI
+
+llm = OpenAI()
+fsc = FewShotClassifier(llm, property_name='bandgap')
+
+# Train on a few examples
+fsc.fit(['ethane', 'propane', 'butane'], [0,1,0])
+
+# Predict on a few more
+fsc.predict(['pentane', 'hexane', 'heptane'])
+```
+
+### Fine-tuning
+
+```python
+
+from chemlift.finetuning.classifier import ChemLIFTClassifierFactory
+
+model = ChemLIFTClassifierFactory('property name',
+                                    model_name='EleutherAI/pythia-1b-deduped').create_model()
+model.fit(X, y)
+model.predict(X)
+```
 
 ## 🚀 Installation
 
@@ -74,20 +106,31 @@ Contributions, whether filing an issue, making a pull request, or forking, are a
 
 The code in this package is licensed under the MIT License.
 
-<!--
+
 ### 📖 Citation
 
 Citation goes here!
--->
 
-<!--
+```
+@article{Jablonka_2023,
+    doi = {10.26434/chemrxiv-2023-fw8n4},
+    url = {https://doi.org/10.26434%2Fchemrxiv-2023-fw8n4},
+    year = 2023,
+    month = {feb},
+    publisher = {American Chemical Society ({ACS})},
+    author = {Kevin Maik Jablonka and Philippe Schwaller and Andres Ortega-Guerrero and Berend Smit},
+    title = {Is {GPT}-3 all you need for low-data discovery in chemistry?}
+}
+```
+
+
+
 ### 🎁 Support
+The work of the LAMALab is supported by the Carl-Zeiss foundation. 
 
-This project has been supported by the following organizations (in alphabetical order):
+In addition, the work was supported by the MARVEL National Centre for Competence in Research funded by the Swiss National Science Foundation (grant agreement ID 51NF40-182892). In addition, we acknoweledge support by the USorb-DAC Project, which is funded by a grant from The Grantham Foundation for the Protection of the Environment to RMI’s climate tech accelerator program, Third Derivative. 
 
-- [Harvard Program in Therapeutic Science - Laboratory of Systems Pharmacology](https://hits.harvard.edu/the-program/laboratory-of-systems-pharmacology/)
 
--->
 
 <!--
 ### 💰 Funding
@@ -99,11 +142,6 @@ This project has been supported by the following grants:
 | DARPA                                                    | [Automating Scientific Knowledge Extraction (ASKE)](https://www.darpa.mil/program/automating-scientific-knowledge-extraction) | HR00111990009   |
 -->
 
-### 🍪 Cookiecutter
-
-This package was created with [@audreyfeldroy](https://github.com/audreyfeldroy)'s
-[cookiecutter](https://github.com/cookiecutter/cookiecutter) package using [@cthoyt](https://github.com/cthoyt)'s
-[cookiecutter-snekpack](https://github.com/cthoyt/cookiecutter-snekpack) template.
 
 ## 🛠️ For Developers
 
