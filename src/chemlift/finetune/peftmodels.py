@@ -21,6 +21,7 @@ from transformers.utils import logging
 from functools import partial
 from peft.utils.save_and_load import set_peft_model_state_dict
 from fastcore.basics import basic_repr
+import time
 
 
 class ChemLIFTClassifierFactory:
@@ -125,7 +126,13 @@ class PEFTClassifier(GPTClassifier):
 
         self.tune_settings["per_device_train_batch_size"] = self.batch_size
 
+        self._fine_tune_time = None
+
     __repr__ = basic_repr(["property_name", "_base_model"])
+
+    @property
+    def fine_tune_time(self):
+        return self._fine_tune_time
 
     def _prepare_df(self, X: ArrayLike, y: ArrayLike):
         rows = []
@@ -255,6 +262,7 @@ class PEFTClassifier(GPTClassifier):
                     dfs.append(formatted)
 
                 formatted = pd.concat(dfs)
+        start_time = time.time()
         train_model(
             self.model,
             self.tokenizer,
@@ -263,6 +271,7 @@ class PEFTClassifier(GPTClassifier):
             hub_model_name=None,
             report_to=None,
         )
+        self._fine_tune_time = time.time() - start_time
 
     def _predict(
         self,
