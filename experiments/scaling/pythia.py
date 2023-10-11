@@ -51,7 +51,7 @@ def train_test(train_size, model_name, random_state=42):
         model_name=model_name,
         load_in_8bit=True,
         inference_batch_size=32,
-        tokenizer_kwargs={"cutoff_len": 50},
+        tokenizer_kwargs={"cutoff_len": 200},
         tune_settings={"num_train_epochs": 32},
     ).create_model()
 
@@ -66,7 +66,7 @@ def train_test(train_size, model_name, random_state=42):
     if not os.path.exists("results"):
         os.makedirs("results")
 
-    outname = f"results/{get_timestr()}_peft_{model_name}_{train_size}.pkl"
+    outname = f"results/{get_timestr()}_peft_{model_name.replace('/', '-')}_{train_size}.pkl"
 
     report["model_name"] = model_name
     report["train_size"] = train_size
