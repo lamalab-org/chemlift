@@ -7,6 +7,7 @@ from numpy.typing import ArrayLike
 import enum
 from typing import Union
 from chemlift.icl.utils import LangChainChatModelWrapper
+import time
 
 
 class Strategy(enum.Enum):
@@ -86,6 +87,11 @@ Answer:
         self._materialclass = "molecules"
         self._max_test = max_test
         self._prefix = prefix
+        self._prediction_time = None
+
+    @property
+    def prediction_time(self):
+        return self._prediction_time
 
     def _format_examples(self, examples, targets):
         """Format examples and targets into a string.
